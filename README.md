@@ -9,7 +9,7 @@ In general, many homeowners keep plants in their own house, whether it's to brin
 
 The issue is that a lot of people are too busy to water their plants sometimes. This can happen when homeowners go on business trips, vacations, or other reasons.
 
-For our final project, we are designing a robot to automatically water plants over a duration of time while the owner is unable to  take care of their plants.
+For our final project, we are designing a robot to automatically water plants over a duration of time while the owner is unable to  take care of their plants. The robot is made using Lego Robot C, which was provided to everyone as the software of choice.
 
 The repo will contain our code for the robot, logs of our changes, and more.
 
