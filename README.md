@@ -3,7 +3,10 @@
 This is our final project for MTE-100 at UW.
 Group Members: Emad Rahman, Taha Malik,  Anas Al-Hanoon, Abdulaziz Abbas
 
-## Overview
+<p align="right">
+  <img src="https://github.com/EmadsGitHub/plant-watering-robot/blob/main/Screenshot%202024-11-08%20121515.png
+## Overview" alt="Plant Watering Robot" width="400"/>
+</p>
 
 In general, many homeowners keep plants in their own house, whether it's to bring more life to the house, increase air quality, etc. These plants require the homeowner to care for them  by watering them on a regular basis. 
 
