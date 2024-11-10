@@ -57,14 +57,14 @@ void orderList (int plantOrder[], int cycles, int &WateringOrder[]){
 }
 void setDuration(int pos, int *intervalArray) {
 	int mins=0;
-	int secs=0;
+	int hrs=0;
 	bool newplant = false;
 
 	while(!newplant) {
 	    eraseDisplay();
-	    displayBigTextLine(1, "How long?");
-	    displayBigTextLine(3, "Minutes (Up)");
-	    displayBigTextLine(5, "Seconds (Down)");
+	    displayBigTextLine(1, "How often?");
+	    displayBigTextLine(3, "Hours (Up)");
+	    displayBigTextLine(5, "Minutes (Down)");
 	    displayBigTextLine(7, "Done (Other)");
 
 	    // Wait for any button press
@@ -81,20 +81,20 @@ void setDuration(int pos, int *intervalArray) {
 	        while (!getButtonPress(buttonEnter)) {
 	            eraseDisplay();  // Clear display each update
 	            displayBigTextLine(1, "Increase Time");
-	            displayBigTextLine(3, "Hours: %d", mins);
+	            displayBigTextLine(3, "Hours: %d", hrs);
 
 	            if (getButtonPress(buttonUp)) {
 	                while(getButtonPress(buttonUp)) {}
 	                wait1Msec(20);
-	                mins = mins + 1;
+	                hrs = hrs + 1;
 	            }
 	            if (getButtonPress(buttonDown)) {
 	                while(getButtonPress(buttonDown)) {}
 	                wait1Msec(20);
-	                mins = mins - 1;
+	                hrs = hrs - 1;
 
 	                // Add bounds checking
-	                if (mins < 0) mins = 0;
+	                if (hrs < 0) hrs = 0;
 	            }
 	            wait1Msec(100);  // Reduced delay for better responsiveness
 	        }
@@ -111,20 +111,20 @@ void setDuration(int pos, int *intervalArray) {
 	        while (!getButtonPress(buttonEnter)) {
 	            eraseDisplay();  // Clear display each update
 	            displayBigTextLine(1, "Increase Time");
-	            displayBigTextLine(3, "Minutes: %d", secs);
+	            displayBigTextLine(3, "Minutes: %d", mins);
 
 	            if (getButtonPress(buttonUp)) {
 	                while(getButtonPress(buttonUp)) {}
 	                wait1Msec(20);
-	                secs = secs + 5;
+	                mins = mins + 5;
 	            }
 	            if (getButtonPress(buttonDown)) {
 	                while(getButtonPress(buttonDown)) {}
 	                wait1Msec(20);
-	                secs = secs - 5;
+	                mins = mins - 5;
 
 	                // Add bounds checking
-	                if (secs < 0) secs = 0;
+	                if (mins < 0) mins = 0;
 	            }
 	            wait1Msec(100);
 	        }
@@ -136,7 +136,7 @@ void setDuration(int pos, int *intervalArray) {
 	        newplant = true;
 	        while (getButtonPress(buttonAny)) {}  // Wait for any button release
 	        wait1Msec(20);
-	        intervalArray[pos] = mins*60+secs;
+	        intervalArray[pos] = hrs*3600+mins*60;
 	    }
 	}
 
