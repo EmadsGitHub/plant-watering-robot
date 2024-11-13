@@ -1,9 +1,19 @@
 #pragma DebuggerWindows ("Globals")
-int days = 0;
-int hours = 0;
-int minutes = 0;
 
-void setDuration(int pos, int *intervalArray) {
+
+
+int converttoSecs(int days, int hours, int minutes) {
+
+    int totalSecs = 0;
+
+    totalSecs += days * 86400;
+    totalSecs += hours * 3600;
+    totalSecs += minutes * 60;
+
+    return totalSecs;
+}
+
+void setDuration(int pos, int *durationArray) {
 	int mins=0;
 	int secs=0;
 	bool newplant = false;
@@ -84,13 +94,17 @@ void setDuration(int pos, int *intervalArray) {
 	        newplant = true;
 	        while (getButtonPress(buttonAny)) {}  // Wait for any button release
 	        wait1Msec(20);
-	        intervalArray[pos] = mins*60+secs;
+	        durationArray[pos] = mins*60+secs;
 	    }
 	}
 
 }
 
-void setTime(int *intervalArray) {
+int setTime() {
+
+		int days = 0;
+		int minutes = 0;
+		int hours = 0;
 
     int currentSelection = 0;
     bool finished = false;
@@ -131,10 +145,73 @@ void setTime(int *intervalArray) {
         }
         if (getButtonPress(buttonEnter)) {
         	finished = true;
+        	while(getButtonPress(buttonEnter)){
+
+        	}
+        	wait1Msec(20);
 
         }
     }
-        eraseDisplay();
+    int runTime = converttoSecs(days, hours, minutes);
+
+		return runTime;
+ }
+
+ int setInterval() {
+
+		int days = 0;
+		int minutes = 0;
+		int hours = 0;
+
+    int currentSelection = 0;
+    bool finished = false;
+
+    while(!finished) {
+
+        displayBigTextLine(1, "Set Plant Interval:");
+        displayBigTextLine(3, "Days: %d", days);
+        displayBigTextLine(5, "Hours: %d", hours);
+        displayBigTextLine(7, "Minutes: %d", minutes);
+
+        if (getButtonPress(buttonUp)) {
+
+            if (currentSelection == 0) days++;
+            else if (currentSelection == 1) hours = (hours + 1) % 24;
+            else if (currentSelection == 2) minutes = (minutes + 1) % 60;
+
+            while (getButtonPress(buttonUp)) {};
+
+        } else if (getButtonPress(buttonDown)) {
+
+            if (currentSelection == 0 && days > 0) days--;
+            else if (currentSelection == 1 && hours > 0) hours--;
+            else if (currentSelection == 2 && minutes > 0) minutes--;
+
+            while (getButtonPress(buttonDown)) {};
+        }
+
+        if (getButtonPress(buttonRight)) {
+
+            currentSelection = (currentSelection + 1) % 3;
+            while (getButtonPress(buttonRight)) {};
+
+        } else if (getButtonPress(buttonLeft)) {
+
+            currentSelection = (currentSelection + 2) % 3;
+            while (getButtonPress(buttonLeft)) {};
+        }
+        if (getButtonPress(buttonEnter)) {
+        	finished = true;
+
+        }
+    }
+    int intervalTime = converttoSecs(days, hours, minutes);
+
+		return intervalTime;
+ }
+
+ void plantPick(int *intervalArray){
+ 				eraseDisplay();
 				bool willloop = true;
 						while(willloop){
 	            displayBigTextLine(1, "Plant?");
@@ -170,21 +247,11 @@ void setTime(int *intervalArray) {
 						}
 
 
-
 }
 
 
 
-int calculateRuntimeInSeconds() {
 
-    int totalSeconds = 0;
-
-    totalSeconds += days * 86400;
-    totalSeconds += hours * 3600;
-    totalSeconds += minutes * 60;
-
-    return totalSeconds;
-}
 
 void runRobot(int runtimeInSeconds) {
 
@@ -214,13 +281,20 @@ void orderList (int plantOrder[], int size, int runtime){
 
 task main() {
     string plantArray[3] = {"Cactus", "Jade", "Aloe"};
-    int intervalArray[3];
-    setTime(intervalArray);
-    int runtimeInSeconds = calculateRuntimeInSeconds();
-
-
-    displayBigTextLine(9, "Runtime: %d sec", runtimeInSeconds);
+    int durationArray[3];
+    int runtimeInSeconds = setTime();
+    int intervalinSeconds = setInterval();
+    plantPick(durationArray);
+		wait1Msec(200);
+    eraseDisplay();
+		wait1Msec(200);
+    displayBigTextLine(1, "Runtime: %d sec", runtimeInSeconds);
+    displayBigTextLine(3, "Interval: %d sec", intervalinSeconds);
     wait1Msec(2000);
+    eraseDisplay();
+    displayBigTextLine(1, "Cactus: %d sec", durationArray[0]);
+    displayBigTextLine(3, "Jade: %d sec", durationArray[1]);
+    displayBigTextLine(5, "Aloe: %d sec", durationArray[2]);
 
     runRobot(runtimeInSeconds);
 }
