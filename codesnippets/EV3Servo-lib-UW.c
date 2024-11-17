@@ -325,12 +325,21 @@ void setServoSpeed(tSensors nxtPort, int servo_number, int speed_setting, int ne
 	{
 		setValidSetting(speed_setting, -MAX_SERVO_SPEED, MAX_SERVO_SPEED);
 
-		if (speed_setting == 0)
+		if (speed_setting == 0){
+			displayBigTextLine(0,"Zero Speed");
 			NXTServo_SetPosition(nxtPort, I2C_ADDR, servo_number, SERVO_NEUTRAL);
-		else if (speed_setting > 0)
+			wait1Msec(1000);
+		}
+		else if (speed_setting > 0){
+			displayString(0, "Number: %d", speed_setting);
 			NXTServo_SetPosition(nxtPort, I2C_ADDR, servo_number, SERVO_NEUTRAL + (speed_setting + pos_offset) * 4);
-		else
+			wait1Msec(1000);
+		}
+		else{
+			displayString(0, "Number: %d", speed_setting);
 			NXTServo_SetPosition(nxtPort, I2C_ADDR, servo_number, SERVO_NEUTRAL + (speed_setting + neg_offset ) * 4);
+			wait1Msec(1000);
+		}
 	}
 }
 

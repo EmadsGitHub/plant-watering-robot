@@ -67,4 +67,7 @@ task main(){
 		wait1Msec(50);
 		SensorMode[S1] = modeEV3Gyro_RateAndAngle;
 		wait1Msec(50);
+		GripperOpen();
+		wait1Msec(100);
+		GripperClose();
 }
