@@ -1,13 +1,14 @@
 void waterPlantBasedOnColor(int duration) {
 
+	nMotorEncoder[motorC] = 0
 	motor[motorC]= 20;
-	wait1Msec(700);
+	while(abs(nMotorEncoder(motorC))<180){}
 	motor[motorC] = 0;
 	wait1Msec(duration);
-	motor[motorC] = -20;
-	wait1Msec(700);
+	nMotorEncoder[motorC] = 0
+	motor[motorC]= -20;
+	while(abs(nMotorEncoder(motorC))<180){}
 	motor[motorC] = 0;
-	
 }
 
 

@@ -2,18 +2,19 @@
 
 
 
-int converttoSecs(int days, int hours, int minutes) {
+int converttoSecs(int days, int hours, int minutes, int secs) {
 
     int totalSecs = 0;
 
     totalSecs += days * 86400;
     totalSecs += hours * 3600;
     totalSecs += minutes * 60;
+    totalSecs = totalSecs+secs;
 
     return totalSecs;
 }
 
-void setDuration(int pos, int *durationArray) {
+int setDuration() {
 	int mins=0;
 	int secs=0;
 	bool newplant = false;
@@ -94,9 +95,9 @@ void setDuration(int pos, int *durationArray) {
 	        newplant = true;
 	        while (getButtonPress(buttonAny)) {}  // Wait for any button release
 	        wait1Msec(20);
-	        durationArray[pos] = mins*60+secs;
 	    }
 	}
+	return converttoSecs(0, 0, mins, secs);
 
 }
 
@@ -105,13 +106,14 @@ int setTime() {
 		int days = 0;
 		int minutes = 0;
 		int hours = 0;
+		int secs = 0;
 
     int currentSelection = 0;
     bool finished = false;
 
     while(!finished) {
 
-        displayBigTextLine(1, "Set Time:");
+        displayBigTextLine(1, "Set Water Time:");
         displayBigTextLine(3, "Days: %d", days);
         displayBigTextLine(5, "Hours: %d", hours);
         displayBigTextLine(7, "Minutes: %d", minutes);
@@ -152,149 +154,57 @@ int setTime() {
 
         }
     }
-    int runTime = converttoSecs(days, hours, minutes);
+    int runTime = converttoSecs(days, hours, minutes, secs);
 
 		return runTime;
  }
 
- int setInterval() {
 
-		int days = 0;
-		int minutes = 0;
-		int hours = 0;
 
-    int currentSelection = 0;
-    bool finished = false;
-
-    while(!finished) {
-
-        displayBigTextLine(1, "Set Plant Interval:");
-        displayBigTextLine(3, "Days: %d", days);
-        displayBigTextLine(5, "Hours: %d", hours);
-        displayBigTextLine(7, "Minutes: %d", minutes);
-
-        if (getButtonPress(buttonUp)) {
-
-            if (currentSelection == 0) days++;
-            else if (currentSelection == 1) hours = (hours + 1) % 24;
-            else if (currentSelection == 2) minutes = (minutes + 1) % 60;
-
-            while (getButtonPress(buttonUp)) {};
-
-        } else if (getButtonPress(buttonDown)) {
-
-            if (currentSelection == 0 && days > 0) days--;
-            else if (currentSelection == 1 && hours > 0) hours--;
-            else if (currentSelection == 2 && minutes > 0) minutes--;
-
-            while (getButtonPress(buttonDown)) {};
-        }
-
-        if (getButtonPress(buttonRight)) {
-
-            currentSelection = (currentSelection + 1) % 3;
-            while (getButtonPress(buttonRight)) {};
-
-        } else if (getButtonPress(buttonLeft)) {
-
-            currentSelection = (currentSelection + 2) % 3;
-            while (getButtonPress(buttonLeft)) {};
-        }
-        if (getButtonPress(buttonEnter)) {
-        	finished = true;
-
-        }
-    }
-    int intervalTime = converttoSecs(days, hours, minutes);
-
-		return intervalTime;
- }
-
- void plantPick(int *intervalArray){
+ int plantPick(){
  				eraseDisplay();
-				bool willloop = true;
-						while(willloop){
+
 	            displayBigTextLine(1, "Plant?");
 			        displayBigTextLine(3, "Cactus (Left)");
 			        displayBigTextLine(5, "Jade (Right)");
 			        displayBigTextLine(7, "Aloe (Up)");
-			        displayBigTextLine(9, "Finished (Down)");
+
 	            while(!getButtonPress(buttonAny)){}
 
 						    if (getButtonPress(buttonLeft)) {
 						        // Wait for button release and add small delay for debouncing
 						     		while (getButtonPress(buttonLeft)){}
 										wait1Msec(20);  // Debounce delay
-										setDuration(0, intervalArray);
+										return 0;
 						    }
-						    if (getButtonPress(buttonRight)) {
+						    else if (getButtonPress(buttonRight)) {
 						        // Wait for button release and add small delay for debouncing
 						     		while (getButtonPress(buttonRight)){}
 										wait1Msec(20);  // Debounce delay
-										setDuration(1, intervalArray);
+										return 1;
 						    }
-						    if (getButtonPress(buttonUp)) {
+						    else if (getButtonPress(buttonUp)) {
 						        // Wait for button release and add small delay for debouncing
 						     		while (getButtonPress(buttonUp)){}
 										wait1Msec(20);  // Debounce delay
-										setDuration(2, intervalArray);
+										return 2;
 						    }
-						    if (getButtonPress(buttonDown)) {
-						        // Wait for button release and add small delay for debouncing
-						     		while (getButtonPress(buttonDown)){}
-										willloop = false;
-						    }
-						}
 
 
+		return -1;
 }
 
 
 
 
 
-void runRobot(int runtimeInSeconds) {
-
-    clearTimer(T1);
-
-    motor[motorA] = motor[motorD] = 50;
-
-    while(time1[T1] < runtimeInSeconds * 1000) {};
-
-    motor[motorA] = motor[motorD] = 50;
-}
-
-/*
-void orderList (int plantOrder[], int size, int runtime){
-	int cycles = runtime/30000;
-	int q = 0;
-	length = size*cycles;
-	int wateringOrder[length];
-	for (int i=0; i<cycles; i++){
-		for (int j = 0; j<size; j++){
-			wateringOrder[(i*size)+j]=plantOrder[j];
-		}
-	}
-}
-
-*/
 
 task main() {
-    string plantArray[3] = {"Cactus", "Jade", "Aloe"};
-    int durationArray[3];
-    int runtimeInSeconds = setTime();
-    int intervalinSeconds = setInterval();
-    plantPick(durationArray);
-		wait1Msec(200);
-    eraseDisplay();
-		wait1Msec(200);
-    displayBigTextLine(1, "Runtime: %d sec", runtimeInSeconds);
-    displayBigTextLine(3, "Interval: %d sec", intervalinSeconds);
-    wait1Msec(2000);
-    eraseDisplay();
-    displayBigTextLine(1, "Cactus: %d sec", durationArray[0]);
-    displayBigTextLine(3, "Jade: %d sec", durationArray[1]);
-    displayBigTextLine(5, "Aloe: %d sec", durationArray[2]);
 
-    runRobot(runtimeInSeconds);
+    int waitTime = setTime();
+    int plantPicked = plantPick();
+    int timeWatered = setDuration();
+		wait1Msec(200);
+    eraseDisplay();
+
 }
