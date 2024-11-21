@@ -2,14 +2,21 @@
 #include "EV3Servo-lib-UW.c"
 // Motor locations on interface board
 const int SV_CSERVO1 = 1;
-const int SV_CSERVO2 = 2;
-const int SV_STANDARD = 3;
-const int SV_GRIPPER = 4;
-// Demo types
-const int CONTINUOUS = buttonUp;
-const int GRIPPER = buttonEnter;
-const int STANDARD = buttonDown;
+float CONVERSION = (2*PI*2.75)/360;
+bool stopCheck = false;
 
+task EmergencyCheck(){
+    while (!stopCheck) {
+        // Check if color sensor detects red
+        if (SensorValue[S3] == 5) {  // 5 typically represents red in RobotC color sensors
+            stopCheck = true;
+            // Stop all motors immediately
+            motor[motorA] = motor[motorD] = 0;
+            // Optional: Add additional emergency stop procedures
+        }
+        wait1Msec(50);  // Short delay to prevent overwhelming the processor
+    }
+}
 
 int converttoSecs(int days, int hours, int minutes, int secs) {
 
@@ -203,42 +210,163 @@ int setTime() {
 		return -1;
 }
 
+void GripperClose(){
+	setServoSpeed(S4,SV_CSERVO1, -60);
+}
+void GripperOpen(){
+	setServoSpeed(S4,SV_CSERVO1, 60);
+}
 
+void plantDropoff(){
+	float CONVERSION = (2*PI*2.75)/360;
+	GripperOpen();
+	wait1Msec(500);
+	nMotorEncoder[motorA] = 0;
+  motor[motorA] = 26;
+  motor[motorD] = 25;
+  while(abs(nMotorEncoder[motorA])*CONVERSION<5){}
+	motor[motorA] = -10;
+	motor[motorD] = 10;
+	while(abs(getGyroDegrees(S1)) < 90){}
+  motor[motorA] = motor[motorD] = 0;
+  resetGyro(S1);
+  wait1Msec(50);
+}
 
+void plantPickup(){
+	float CONVERSION = (2*PI*2.75)/360;
+	GripperClose();
+	wait1Msec(1000);
+	motor[motorA] = motor[motorD] = 0;
+	wait1Msec(500);
+	nMotorEncoder[motorA] = 0;
 
-
-
+  motor[motorA] = 25;
+  motor[motorD] = 25;
+  while(abs(nMotorEncoder[motorA])*CONVERSION<10){}
+	motor[motorA] = -10;
+	motor[motorD] = 10;
+	while(abs(getGyroDegrees(S1)) < 86){}
+  motor[motorA] = motor[motorD] = 0;
+  resetGyro(S1);
+  wait1Msec(50);
+}
 
 void driveUntilColor(int plant, int dir) {
+
+
 	/*
 0 = Cactus
 1 = Jade
 2 = Aloe
 */
 	if (plant == 0){
-			motor[motorA]=-25*dir;
-    	motor[motorD] = -25*dir;
-    	while(SensorValue[S3]<20 || SensorValue[S3]>25){}
+		if (dir==-1){
+			motor[motorA]=26;
+    	motor[motorD] = 25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=2 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
+
     	motor[motorA] = motor[motorD] = 0;
     	wait1Msec(200);
+      nMotorEncoder[motorA]=0;
+    	motor[motorA] = 26;
+  		motor[motorD] = 25;
+  		while(abs(nMotorEncoder[motorA])*CONVERSION<5){}
+  		wait1Msec(50);
+		}
+		else{
+			motor[motorA]=-25;
+    	motor[motorD] = -25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=2 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
+    	motor[motorA] = motor[motorD] = 0;
+    	wait1Msec(200);
+
+		}
+
 	}
 	if (plant == 1){
-			motor[motorA]=-25*dir;
-    	motor[motorD] = -25*dir;
-    	while(SensorValue[S3]<20 || SensorValue[S3]>25){}
+			if (dir==-1){
+			motor[motorA]=26;
+    	motor[motorD] = 25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=6 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
     	motor[motorA] = motor[motorD] = 0;
     	wait1Msec(200);
+      nMotorEncoder[motorA]=0;
+    	motor[motorA] = 26;
+  		motor[motorD] = 25;
+  		while(abs(nMotorEncoder[motorA])*CONVERSION<5){}
+  		wait1Msec(50);
+		}
+		else{
+			motor[motorA]=-25;
+    	motor[motorD] = -25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=6 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
+    	motor[motorA] = motor[motorD] = 0;
+    	wait1Msec(200);
+
+		}
 	}
 	if (plant == 2){
-			motor[motorA]=-25*dir;
-    	motor[motorD] = -25*dir;
-    	while(SensorValue[S3]<20 || SensorValue[S3]>25){}
+			if (dir==-1){
+			motor[motorA]=26;
+    	motor[motorD] = 25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=3 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
     	motor[motorA] = motor[motorD] = 0;
     	wait1Msec(200);
+      nMotorEncoder[motorA]=0;
+    	motor[motorA] = 26;
+  		motor[motorD] = 25;
+  		while(abs(nMotorEncoder[motorA])*CONVERSION<5){}
+  		wait1Msec(50);
+		}
+		else{
+			motor[motorA]=-25;
+    	motor[motorD] = -25;
+    	for (int i = 0; i<3; i++){
+    		while(SensorValue[S3]!=3 && !stopCheck){}
+    		if (stopCheck) {
+        	return;
+    		}
+    		wait1Msec(50);
+    	}
+    	motor[motorA] = motor[motorD] = 0;
+    	wait1Msec(200);
+
+		}
 	}
 
-    motor[motorA] = (15);
-    motor[motorD] = -15;
+    motor[motorA] = (10);
+    motor[motorD] = -10;
     while(abs(getGyroDegrees(S1)) < 88){}
     motor[motorA] = motor[motorD] = 0;
     resetGyro(S1);
@@ -248,47 +376,22 @@ void driveUntilColor(int plant, int dir) {
 
 void waterPlantBasedOnColor(int duration) {
 
-	nMotorEncoder[motorC] = 0
-	motor[motorC]= 20;
-	while(abs(nMotorEncoder(motorC))<180){}
+	nMotorEncoder[motorC] = 0;
+	motor[motorC]= -10;
+	while(abs(nMotorEncoder(motorC))<120){}
 	motor[motorC] = 0;
 	wait1Msec(duration);
-	nMotorEncoder[motorC] = 0
-	motor[motorC]= -20;
-	while(abs(nMotorEncoder(motorC))<180){}
+	nMotorEncoder[motorC] = 0;
+	motor[motorC]= 10;
+	while(abs(nMotorEncoder(motorC))<440){}
 	motor[motorC] = 0;
+	nMotorEncoder[motorC] = 0;
+	motor[motorC]= -10;
+	while(abs(nMotorEncoder(motorC))<315){}
+	motor[motorC] = 0;
+
 }
 
-
-void GripperClose(){
-	setServoSpeed(S4,SV_CSERVO1, -60);
-}
-void GripperOpen(){
-	setServoSpeed(S4,SV_CSERVO1, 60);
-}
-
-void plantPickup(){
-	GripperClose();
-	wait1Msec(1000);
-	motor[motorA] = motor[motorD] = 0;
-	wait1Msec(500);
-	motor[motorA] = 0;
-	motor[motorD] = 15;
-	while(abs(getGyroDegrees(S1)) < 90){}
-  motor[motorA] = motor[motorD] = 0;
-  resetGyro(S1);
-  wait1Msec(50);
-}
-
-void plantDropoff(){
-	GripperOpen();
-	wait1Msec(500);
-	motor[motorA] = 0;
-	motor[motorD] = 15;
-	while(abs(getGyroDegrees(S1)) < 90){}
-  motor[motorA] = motor[motorD] = 0;
-  resetGyro(S1);
-}
 
 
 task main()
@@ -303,39 +406,56 @@ task main()
 		wait1Msec(50);
 		SensorMode[S1] = modeEV3Gyro_RateAndAngle;
 		wait1Msec(50);
-		string plantArray[3] = {"Cactus", "Jade", "Aloe"};
-    int durationArray[3];
-    int runtimeInSeconds = setTime();
-    int intervalinSeconds = setInterval();
-    plantPick(durationArray);
+    int waitTime = setTime();
+    int plantPicked = plantPick();
+    int timeWatered = setDuration();
 		wait1Msec(200);
     eraseDisplay();
-		wait1Msec(200);
+
+    clearTimer(T1);
+    while (time1[T1]<waitTime*1000){}
+    startTask(EmergencyCheck);
+		wait1Msec(50);
+    driveUntilColor(plantPicked, 1);
+    wait1Msec(50);
+    nMotorEncoder[motorA] = 0;
+    motor[motorA] = -25;
+    motor[motorD] = -25;
+    while(abs(nMotorEncoder[motorA])*CONVERSION<10){}///500 is a placeholder, do the math to actually find out how long it goes back for
+    motor[motorA] = motor[motorD] = 0;
+    wait1Msec(50);
+    plantPickup();
+    wait1Msec(50);
+    nMotorEncoder[motorA] = 0;
+    motor[motorA]= -25;
+    motor[motorD]= -25;
     for (int i = 0; i<3; i++){
-    	if (durationArray[i] == 0){
-    		plantArray[i]="";
+    	while(SensorValue[S3]!=4 && !stopCheck){}
+    	if (stopCheck) {
+        return;
     	}
+    	wait1Msec(50);
     }
-    int cycles = runtimeInSeconds/intervalinSeconds;
-    for (int i = 0; i<cycles; i++){
-    	for (int j = 0; j<3; j++){
-    		if (plantArray[j] == "Cactus"){
-    			waterOnePlant(4);
-    		}
-    		else if (plantArray[j] == "Jade"){
-    			waterOnePlant(3);
-    		}
-    		else if (plantArray[j] == "Aloe"){
-    			waterOnePlant(5);
-    		}
-    		else{
-
-    		}
-    	}
-    	wait1Msec(intervalinSeconds);
-    }
+    motor[motorA]=motor[motorD] = 0;
+    wait1Msec(10000);
 
 
+		waterPlantBasedOnColor(timeWatered*1000);
+   	wait1Msec(1000);
 
 
+   	driveUntilColor(plantPicked, -1);
+    wait1Msec(50);
+    nMotorEncoder[motorA] = 0;
+    motor[motorA] = -25;
+    motor[motorD] = -25;
+    while(abs(nMotorEncoder[motorA])*CONVERSION<10){}///500 is a placeholder, do the math to actually find out how long it goes back for
+    motor[motorA] = motor[motorD] = 0;
+    wait1Msec(50);
+    plantDropoff();
+    motor[motorA] = 25;
+    motor[motorD] = 25;
+    wait1Msec(1800);
+   	motor[motorA] = motor[motorD] = 0;
+    wait1Msec(50);
 }
