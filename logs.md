@@ -2,3 +2,5 @@ November 8th - GitHub page created, base functions started and updated to reposi
 November 10th - Updated driveUntilColor, timeTest
 November 12th - Finalized timeTest, updated driveUntilColor, waterMotor, plantGripper.
 November 17th - Put together unit test in the driveUntilColor file.
+November 19th - Finalized drive until color
+November 20th - Finalized merging all code.
